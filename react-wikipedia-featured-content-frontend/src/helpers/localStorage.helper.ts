@@ -1,10 +1,10 @@
 import { Tfa } from "../redux/rtk-query/feed/feed.interfaces";
 
-type LocalStorageKeys = "feed-seen-list" | "theme" | "language";
+type LocalStorageKeys = "feed-seen-list" | "activeTheme" | "language";
 
 type LocalStorageValues = {
     "feed-seen-list": Array<Tfa>;
-    theme: "light" | "dark";
+    activeTheme: "light" | "dark";
     language: "en" | "es";
 };
 

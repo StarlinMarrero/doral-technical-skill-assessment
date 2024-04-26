@@ -2,12 +2,12 @@ import React, { useEffect, useState } from "react";
 import localStorageHelper from "../../helpers/localStorage.helper";
 
 const Navbar = () => {
-    const themeSelected = localStorageHelper?.getItem("theme") || "light";
+    const themeSelected = localStorageHelper?.getItem("activeTheme") || "light";
     const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(themeSelected);
 
     useEffect(() => {
         document.documentElement.setAttribute("data-theme", currentTheme);
-        localStorageHelper.setItem("theme", currentTheme);
+        localStorageHelper.setItem("activeTheme", currentTheme);
     }, [currentTheme]);
 
     const toggleTheme = () => {
