@@ -1,0 +1,29 @@
+version: "3"
+services:
+    react-app:
+        build:
+            context: "./react-wikipedia-featured-content-frontend"
+            dockerfile: Dockerfile
+        ports:
+            - 3000:3000
+        # volumes:
+        #     - ./react-app:/app
+        depends_on:
+            - nestjs-app
+        networks:
+            - app-network
+
+    nestjs-app:
+        build:
+            context: "./nestjs-wikipedia-api-proxy-backend"
+            dockerfile: Dockerfile
+        ports:
+            - 4000:4000
+        # volumes:
+        #     - ./nestjs-app:/app
+        networks:
+            - app-network
+
+networks:
+    app-network:
+        driver: bridge

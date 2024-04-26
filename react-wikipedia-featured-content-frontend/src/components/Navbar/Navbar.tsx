@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import localStorageHelper from "../../helpers/localStorage.helper";
 
 const Navbar = () => {
-    const themeSelected = localStorageHelper.getItem("theme") || "light";
+    const themeSelected = localStorageHelper?.getItem("theme") || "light";
     const [currentTheme, setCurrentTheme] = useState<"light" | "dark">(themeSelected);
 
     useEffect(() => {
