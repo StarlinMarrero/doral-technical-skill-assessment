@@ -6,8 +6,6 @@ services:
             dockerfile: Dockerfile
         ports:
             - 3000:3000
-        # volumes:
-        #     - ./react-app:/app
         depends_on:
             - nestjs-app
         networks:
@@ -19,8 +17,6 @@ services:
             dockerfile: Dockerfile
         ports:
             - 4000:4000
-        # volumes:
-        #     - ./nestjs-app:/app
         networks:
             - app-network
 
