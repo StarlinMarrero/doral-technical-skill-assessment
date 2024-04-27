@@ -9,8 +9,8 @@ const SkeletonCard = ({ multiple = 1, ...rest }: IProps) => {
         return (
             <>
                 {[...Array(multiple)].map((_, index) => (
-                    <div {...rest}>
-                        <React.Fragment key={index}>
+                    <div {...rest} key={index}>
+                        <React.Fragment>
                             <div className="skeleton h-32 w-full"></div>
                             <div className="skeleton h-4 w-28"></div>
                             <div className="skeleton h-4 w-full"></div>

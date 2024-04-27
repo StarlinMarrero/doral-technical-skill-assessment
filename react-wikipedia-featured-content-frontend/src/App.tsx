@@ -9,27 +9,28 @@ import "react-datepicker/dist/react-datepicker.css";
 import RootLayout from "./components/Layouts/RootLayout";
 import Tab from "./components/Tab/Tab";
 import Modal from "./components/Modal/Modal";
-import { EnumLanguage, Tfa, TypeLanguage } from "./redux/rtk-query/feed/feed.interfaces";
+import { EnumLanguage, IWikipediaFeedRequest, Tfa, TypeLanguage } from "./redux/rtk-query/feed/feed.interfaces";
 import DetailsArticleModal from "./components/pages/home/DetailsArticleModal";
 import localStorageHelper from "./helpers/localStorage.helper";
 import Spinner from "./components/Spinner/Spinner";
 import Dropdown from "./components/Dropdown/Dropdown";
 import SkeletonCard from "./components/Skeleton/Skeleton";
 import { useForm } from "./hooks/useForm";
+import useScreenWidth from "./hooks/useScreenWidth";
+import { useDebounce } from "./hooks/useDebounce";
 
 function App() {
-    const dateYesterday = new Date();
-    const { form, onChange } = useForm({
-        date: dateYesterday,
+    const { form, onChange } = useForm<IWikipediaFeedRequest>({
+        date: new Date().toString(),
         lang: "en",
     });
-    // const [selectedDate, setSelectedDate] = useState(dateYesterday);
+    const withScreen = useScreenWidth();
+
     const [page, setPage] = useState(1);
     const [pageSize, setPageSize] = useState(5);
     const [isOpenModalDetails, setIsOpenModalDetails] = useState(false);
     const [detailsToShowArticle, setDetailsToShowArticle] = useState<Partial<Tfa>>({});
-    const [languageSelected, setLanguageSelected] = useState<TypeLanguage>("en");
-
+    const dateDebounce = useDebounce(form.date, 1000);
     const [listSeenTfa, setListSeenTfa] = useState(localStorageHelper.getItem("feed-seen-list") || []);
 
     const {
@@ -37,8 +38,8 @@ function App() {
         isFetching,
         refetch,
     } = useGetFeedQuery({
-        date: dateFeedFilter(form.date),
-        lang: languageSelected,
+        date: dateFeedFilter(new Date(dateDebounce)),
+        lang: form.lang,
     });
 
     const [mostReadArticles, setMostReadArticles] = useState(dataFeeds?.mostread?.articles || []);
@@ -88,6 +89,15 @@ function App() {
         }
     }, [page, dataFeeds]);
 
+    useEffect(() => {
+        // increase the page size when the screen is bigger
+        if (withScreen > 1024) {
+            setPageSize(10);
+        } else {
+            setPageSize(5);
+        }
+    }, [withScreen]);
+
     return (
         <>
             <RootLayout>
@@ -97,12 +107,15 @@ function App() {
                             <h3 className="text-2xl font-bold">Welcome to Wikipedia Feeds</h3>
                             <p className="text-sm">Wikipedia Feeds is a web application that allows you to see the most read articles and the events that happened on this day in history.</p>
                         </div>
-                        <div className="grid grid-cols-2">
+                        <div
+                            className="grid 
+                        grid-cols-1 md:grid-cols-2
+                        ">
                             <div className="mt-2">
                                 <span className="mr-2">
                                     <i className="fas fa-calendar-alt"></i>
                                 </span>
-                                <DatePicker className="input input-bordered w-full max-w-xs" selected={form.date} onChange={handleDateChange} />
+                                <DatePicker className="input input-bordered w-full max-w-xs" selected={new Date(form.date)} onChange={handleDateChange} />
                             </div>
                             <div className="col-span-1">
                                 <span className="mr-2"></span>
@@ -110,7 +123,7 @@ function App() {
                                     title={
                                         <>
                                             <i className="fas fa-language"></i>
-                                            Language -{Object.entries(EnumLanguage).find((item) => item[1] === languageSelected)?.[0] || "en"}
+                                            Language -{Object.entries(EnumLanguage).find((item) => item[1] === form.lang)?.[0] || "en"}
                                         </>
                                     }
                                     items={[
@@ -124,7 +137,7 @@ function App() {
                                                     className="dropdown-item"
                                                     onClick={(e) => {
                                                         e.preventDefault();
-                                                        setLanguageSelected(value);
+                                                        onChange(value, "lang");
                                                     }}>
                                                     {key}
                                                 </a>
@@ -139,42 +152,37 @@ function App() {
                 <Tab
                     xs={{
                         style: {
-                            overflow: "auto",
-                            maxHeight: "calc(100vh - 300px)",
+                            overflow: "scroll",
+                            overflowX: "hidden",
+                            height: withScreen > 1024 ? "calc(100vh - 20rem)" : "calc(100vh - 5rem)",
+                            marginBottom: withScreen > 1024 ? "0" : "1rem",
                         },
                         ref: loader,
                     }}
                     handleTabChangeCallback={() => {
                         setPage(1);
                     }}
-                    contentClassName={"overscroll-auto gab-4 h-full"}
+                    // contentClassName={"overscroll-auto gab-4 h-full"}
                     tabs={[
                         {
                             title: "Most Read",
                             content: (
                                 <>
                                     {isFetching ? (
-                                        <div
-                                            className="grid lg:grid-cols-3 mt-2 md:grid-cols-2 grid-cols-1 gap-10 xl:grid-cols-4
-                                        2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 6xl:grid-cols-9 7xl:grid-cols-10 8xl:grid-cols-11 9xl:grid-cols-12">
+                                        <div className="grid lg:grid-cols-3 mt-2 md:grid-cols-2 grid-cols-1 gap-10 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 6xl:grid-cols-9 7xl:grid-cols-10 8xl:grid-cols-11 9xl:grid-cols-12">
                                             <SkeletonCard className="flex flex-col gap-4 w-full h-full p-6 mt-6" multiple={5} />
                                         </div>
                                     ) : (
                                         <>
-                                            <div
-                                                className="
-                                        grid lg:grid-cols-3 mt-2 md:grid-cols-2 grid-cols-1 gap-4 xl:grid-cols-4
-                                            2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 6xl:grid-cols-9 7xl:grid-cols-10 8xl:grid-cols-11 9xl:grid-cols-12">
-                                                {mostReadArticles.length === 0 && (
-                                                    <div className="w-full h-full p-6 bg-base-100 shadow-xl mt-6">
-                                                        <h5 className="text-center">No data found</h5>
-                                                    </div>
-                                                )}
+                                            {mostReadArticles.length === 0 && (
+                                                <div className="w-full h-full p-6 text-center">
+                                                    <h5>No data found</h5>
+                                                </div>
+                                            )}
+                                            <div className="grid lg:grid-cols-3 mt-2 md:grid-cols-2 grid-cols-1 gap-4 xl:grid-cols-4 2xl:grid-cols-5 3xl:grid-cols-6 4xl:grid-cols-7 5xl:grid-cols-8 6xl:grid-cols-9 7xl:grid-cols-10 8xl:grid-cols-11 9xl:grid-cols-12">
                                                 {mostReadArticles?.map((feed, index) => (
                                                     <div key={index}>
                                                         <Card
-                                                            // className="w-full h-full p-6 bg-base-100 shadow-xl mt-6"
-                                                            //make diferent the card when is seen
                                                             className={`w-full h-full p-6 bg-base-100 shadow-xl mt-6 ${listSeenTfa.find((seen) => seen.title === feed.title) ? "bg-base-300 opacity-50" : ""}`}
                                                             imgSrc={feed.thumbnail?.source}
                                                             imgStyle={{

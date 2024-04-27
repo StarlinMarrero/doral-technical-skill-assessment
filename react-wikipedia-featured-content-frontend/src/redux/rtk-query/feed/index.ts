@@ -14,8 +14,6 @@ export const feedRTKProvider = createApi({
                 params: data,
             }),
             transformResponse: (response: IWikipediaFeedResponse) => {
-                console.log(`🚨 - getFeed - response:`, response);
-                
                 return response;
             }
         }),
