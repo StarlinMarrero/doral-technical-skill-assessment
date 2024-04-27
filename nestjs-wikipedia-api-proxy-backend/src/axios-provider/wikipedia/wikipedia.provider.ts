@@ -16,8 +16,6 @@ export class WikipediaProvider extends AxiosProvider {
         const year = dateObj.getFullYear();
         const month = (dateObj.getMonth() + 1).toString().padStart(2, "0");
         const day = dateObj.getDate().toString().padStart(2, "0");
-        console.log(`year: ${year}, month: ${month}, day: ${day}`);
-
         return await this.get(`/feed/v1/wikipedia/${lang}/featured/${year}/${month}/${day}`);
     }
 }

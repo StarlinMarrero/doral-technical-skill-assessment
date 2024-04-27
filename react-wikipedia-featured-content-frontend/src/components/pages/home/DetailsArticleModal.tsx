@@ -6,7 +6,6 @@ interface IProps {
 }
 
 const DetailsArticleModal = ({ data }: IProps) => {
-    console.log(`🚨 - DetailsArticleModal - data:`, data);
 
     return (
         <>

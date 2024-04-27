@@ -21,7 +21,6 @@ export class AxiosProvider {
                 data: response.data,
             };
         } catch (error) {
-            console.log(`🚨 - AxiosProvider - error:`, error);
             return {
                 error,
             };
