@@ -12,8 +12,9 @@ To run the project using Docker Compose, follow these steps:
     ```bash
     git clone <repository-url>
     ```
+2.  Create a `.env` file in both folder backend and frontend with the required environment variables. You can use the `.env.example` file as a template. 
 
-2. Navigate to the project root "./" where docker-compose.yml is located and build the Docker images and start the containers:
+3. Navigate to the project root "./" where docker-compose.yml is located and build the Docker images and start the containers:
 
 ```bash
 1. docker-compose up --build
